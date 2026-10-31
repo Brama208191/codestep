@@ -1,0 +1,50 @@
+server:
+  port: 8080
+  shutdown: graceful
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: codestep
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/codestep}
+    username: ${DB_USER:codestep}
+    password: ${DB_PASSWORD:codestep}
+    hikari:
+      maximum-pool-size: 5
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  mvc:
+    async:
+      request-timeout: 300000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: codestep
+    distribution:
+      percentiles-histogram:
+        codestep.judge.duration: true
+        codestep.queue.wait: true
+
+codestep:
+  api:
+    enabled: ${CODESTEP_API_ENABLED:true}
+    max-in-flight-per-client: 3
+    max-queued: ${CODESTEP_MAX_QUEUED:100}
+  worker:
+    enabled: ${CODESTEP_WORKER_ENABLED:true}
+    threads: ${CODESTEP_WORKER_THREADS:2}
+
+judge:
+  image: ${JUDGE_IMAGE:codestep-runner:latest}
+  runtime: ${JUDGE_RUNTIME:}
+  time-limit-seconds: 2
+  max-code-length: 50000

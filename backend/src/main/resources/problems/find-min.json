@@ -1,0 +1,36 @@
+{
+  "slug": "find-min",
+  "title": "Find the Smallest Number",
+  "topic": "Arrays",
+  "pattern": "Best so far",
+  "order": 2,
+  "difficulty": 1,
+  "mode": "METHOD",
+  "description": "Same idea as the last problem, from the other side.\n\nGiven an array `nums` with at least one number, return the smallest number in it.\n\nExample: for `nums = [6, 1, 4]` return `1`.",
+  "starterCode": "class Solution {\n    public int findMin(int[] nums) {\n        \n    }\n}\n",
+  "harness": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = in.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = in.nextInt();\n        }\n        System.out.println(new Solution().findMin(nums));\n    }\n}\n",
+  "hints": [
+    "Concept: this uses the same pattern as Find the Biggest Number. Look back at your solution there.",
+    "Approach: remember the smallest number seen so far, starting with the first one. Replace it whenever you find a smaller one.",
+    "Pseudocode:\n  smallest = nums[0]\n  for each number x in nums:\n      if x < smallest:\n          smallest = x\n  return smallest",
+    "Almost there:\n  int smallest = nums[0];\n  for (int i = 0; i < nums.length; i++) {\n      if (nums[i] ??? smallest) {\n          smallest = nums[i];\n      }\n  }\n  return smallest;"
+  ],
+  "workedExample": {
+    "title": "Length of the Longest Word",
+    "description": "Given an array of words, return the length of the longest one.",
+    "solution": "class Solution {\n    public int longestLength(String[] words) {\n        int best = words[0].length();\n        for (int i = 0; i < words.length; i++) {\n            if (words[i].length() > best) {\n                best = words[i].length();\n            }\n        }\n        return best;\n    }\n}",
+    "explanation": "Different data (words instead of numbers), same **best so far** pattern: start with the first item, compare each item to the best, and update when you find a better one.\n\nOnce you spot this pattern, you can use it for biggest, smallest, longest, shortest, oldest…"
+  },
+  "walkthrough": [
+    { "array": [6, 1, 4], "pointers": { "i": 0 }, "highlight": [0], "vars": { "smallest": 6 }, "note": "Start with smallest = 6." },
+    { "array": [6, 1, 4], "pointers": { "i": 1 }, "highlight": [1], "vars": { "smallest": 1 }, "note": "1 is smaller than 6. Now remember 1." },
+    { "array": [6, 1, 4], "pointers": { "i": 2 }, "highlight": [1], "vars": { "smallest": 1 }, "note": "4 is not smaller than 1. Keep 1. Return 1." }
+  ],
+  "tests": [
+    { "input": "3\n6 1 4\n", "expected": "1", "display": "nums = [6, 1, 4]", "sample": true, "mistakes": [{"output":"0","hint":"`smallest` started at 0, and no positive number is smaller than 0. Start it at `nums[0]` instead."},{"output":"6","hint":"You found the biggest number. To find the smallest, flip the comparison to `<`."}] },
+    { "input": "1\n9\n", "expected": "9", "display": "nums = [9]", "sample": true },
+    { "input": "4\n-5 -2 -9 -3\n", "expected": "-9", "display": "nums = [-5, -2, -9, -3]", "sample": false },
+    { "input": "5\n5 4 3 2 1\n", "expected": "1", "display": "nums = [5, 4, 3, 2, 1]", "sample": false, "mistakes": [{"output":"2","hint":"You skipped the last number. The loop should run while `i < nums.length`."}] },
+    { "input": "3\n0 10 0\n", "expected": "0", "display": "nums = [0, 10, 0]", "sample": false }
+  ]
+}

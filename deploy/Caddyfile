@@ -1,0 +1,18 @@
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	@actuator path /actuator*
+	respond @actuator 404
+
+	reverse_proxy frontend:80 {
+		flush_interval -1
+	}
+}

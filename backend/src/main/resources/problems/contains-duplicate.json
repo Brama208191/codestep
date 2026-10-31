@@ -1,0 +1,38 @@
+{
+  "slug": "contains-duplicate",
+  "title": "Any Duplicates?",
+  "topic": "HashMap",
+  "pattern": "Remember what you have seen",
+  "order": 15,
+  "difficulty": 2,
+  "mode": "METHOD",
+  "description": "Given an array `nums`, return `true` if any number appears more than once, and `false` if every number is different.\n\nExample: for `nums = [1, 2, 3, 1]` return `true`, because 1 appears twice.",
+  "starterCode": "class Solution {\n    public boolean hasDuplicate(int[] nums) {\n        \n    }\n}\n",
+  "harness": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = in.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = in.nextInt();\n        }\n        System.out.println(new Solution().hasDuplicate(nums));\n    }\n}\n",
+  "hints": [
+    "Concept: a `HashSet` is a collection that remembers which values it has seen. `set.contains(x)` answers \"have I seen x before?\" instantly, and `set.add(x)` remembers x.",
+    "Approach: go through the numbers once. For each number, check whether you've seen it already. If yes, there's a duplicate. If not, remember it and move on. (Comparing every pair with two loops also works, it's just slower.)",
+    "Pseudocode:\n  seen = empty set\n  for each x in nums:\n      if seen contains x: return true\n      add x to seen\n  return false",
+    "Almost there:\n  Set<Integer> seen = new HashSet<>();\n  for (int x : nums) {\n      if (???) {\n          return true;\n      }\n      seen.add(x);\n  }\n  return false;\n\nRemember `import java.util.*;` at the top."
+  ],
+  "workedExample": {
+    "title": "Count Distinct Numbers",
+    "description": "Return how many different values are in `nums`. For `[4, 4, 2, 7, 2]` the answer is `3`.",
+    "solution": "import java.util.HashSet;\nimport java.util.Set;\n\nclass Solution {\n    public int countDistinct(int[] nums) {\n        Set<Integer> seen = new HashSet<>();\n        for (int x : nums) {\n            seen.add(x);\n        }\n        return seen.size();\n    }\n}",
+    "explanation": "A set ignores values it already has, so adding every number leaves exactly one copy of each distinct value.\n\nFor your problem, check `contains` before adding: if the set already has the number, you've found a repeat."
+  },
+  "walkthrough": [
+    { "array": [1, 2, 3, 1], "pointers": { "i": 0 }, "highlight": [0], "vars": { "seen": "{1}" }, "note": "1 isn't in seen. Add it." },
+    { "array": [1, 2, 3, 1], "pointers": { "i": 1 }, "highlight": [1], "vars": { "seen": "{1, 2}" }, "note": "2 isn't in seen. Add it." },
+    { "array": [1, 2, 3, 1], "pointers": { "i": 2 }, "highlight": [2], "vars": { "seen": "{1, 2, 3}" }, "note": "3 isn't in seen. Add it." },
+    { "array": [1, 2, 3, 1], "pointers": { "i": 3 }, "highlight": [0, 3], "vars": { "seen": "{1, 2, 3}" }, "note": "1 is already in seen. That's a duplicate, so return true." }
+  ],
+  "tests": [
+    { "input": "4\n1 2 3 1\n", "expected": "true", "display": "nums = [1, 2, 3, 1]", "sample": true, "mistakes": [{"output":"false","hint":"The repeated numbers aren't next to each other. Compare each number with everything you've seen before, not just its neighbour. A HashSet makes that easy."}] },
+    { "input": "3\n1 2 3\n", "expected": "false", "display": "nums = [1, 2, 3]", "sample": true },
+    { "input": "0\n\n", "expected": "false", "display": "nums = []", "sample": false },
+    { "input": "1\n7\n", "expected": "false", "display": "nums = [7]", "sample": false },
+    { "input": "5\n5 9 2 9 4\n", "expected": "true", "display": "nums = [5, 9, 2, 9, 4]", "sample": false },
+    { "input": "4\n-1 0 1 -1\n", "expected": "true", "display": "nums = [-1, 0, 1, -1]", "sample": false }
+  ]
+}

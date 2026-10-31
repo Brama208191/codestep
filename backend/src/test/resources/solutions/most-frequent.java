@@ -1,0 +1,1 @@
+import java.util.*; class Solution { public int mostFrequent(int[] a) { Map<Integer,Integer> c = new TreeMap<>(); for (int x : a) c.merge(x, 1, Integer::sum); int best = 0, bc = 0; for (var e : c.entrySet()) if (e.getValue() > bc) { best = e.getKey(); bc = e.getValue(); } return best; } }

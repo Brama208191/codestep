@@ -1,0 +1,41 @@
+x-prod-backend-env: &prod-backend-env
+  DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+
+  api:
+    environment:
+      <<: *prod-backend-env
+
+  worker:
+    environment:
+      <<: *prod-backend-env
+      CODESTEP_WORKER_THREADS: ${WORKER_THREADS:-2}
+      JUDGE_RUNTIME: ${JUDGE_RUNTIME:-}
+
+  frontend:
+    ports: !reset []
+
+  caddy:
+    image: caddy:2.8-alpine
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - frontend
+    mem_limit: 64m
+    restart: unless-stopped
+
+volumes:
+  caddy-data:
+  caddy-config:

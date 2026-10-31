@@ -1,0 +1,38 @@
+{
+  "slug": "longest-word",
+  "title": "Longest Word",
+  "topic": "Strings",
+  "pattern": "Best so far",
+  "order": 14,
+  "difficulty": 3,
+  "mode": "PROGRAM",
+  "description": "Write the whole program. Read the input however you like.\n\nThe input is one line of words separated by single spaces. Print the longest word.\n\nIf several words tie for the longest, print the one that appears first.\n\nExample input:\n```\nthe quick brown fox\n```\nExpected output: `quick` (both \"quick\" and \"brown\" have 5 letters, and \"quick\" comes first).",
+  "starterCode": "public class Main {\n    public static void main(String[] args) {\n        \n    }\n}\n",
+  "harness": null,
+  "hints": [
+    "Concept: `line.split(\" \")` turns a sentence into an array of words. Once you have an array, finding the longest is like finding the largest number.",
+    "Approach: remember the best word so far. Go through the words, and replace the best word only when the current one is strictly longer. Using \"strictly longer\" (not \"longer or equal\") keeps the first word when there's a tie.",
+    "Pseudocode:\n  line = read one line\n  words = split line by spaces\n  best = words[0]\n  for each word in words:\n      if word.length > best.length:\n          best = word\n  print best",
+    "Almost there (one way, using Scanner):\n  Scanner in = new Scanner(System.in);\n  String[] words = in.nextLine().split(\" \");\n  String best = words[0];\n  for (String word : words) {\n      if (???) {\n          best = word;\n      }\n  }\n  System.out.println(best);"
+  ],
+  "workedExample": {
+    "title": "Shortest Word Length",
+    "description": "Read a line of words and print the length of the shortest word.",
+    "solution": "import java.io.BufferedReader;\nimport java.io.InputStreamReader;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));\n        String[] words = in.readLine().split(\" \");\n        int shortest = words[0].length();\n        for (String word : words) {\n            shortest = Math.min(shortest, word.length());\n        }\n        System.out.println(shortest);\n    }\n}",
+    "explanation": "This version reads the line with `BufferedReader`; `Scanner.nextLine()` would work just as well.\n\nSplitting turns the problem into an array problem. Then it's the familiar \"remember the best so far\" loop. For your problem, remember the word itself instead of just its length."
+  },
+  "walkthrough": [
+    { "array": ["the", "quick", "brown", "fox"], "pointers": { "i": 0 }, "highlight": [0], "vars": { "best": "\"the\"" }, "note": "Start with best = \"the\" (length 3)." },
+    { "array": ["the", "quick", "brown", "fox"], "pointers": { "i": 1 }, "highlight": [1], "vars": { "best": "\"quick\"" }, "note": "\"quick\" has 5 letters, more than 3. best becomes \"quick\"." },
+    { "array": ["the", "quick", "brown", "fox"], "pointers": { "i": 2 }, "highlight": [1], "vars": { "best": "\"quick\"" }, "note": "\"brown\" also has 5 letters. It isn't strictly longer, so best stays \"quick\"." },
+    { "array": ["the", "quick", "brown", "fox"], "pointers": { "i": 3 }, "highlight": [1], "vars": { "best": "\"quick\"" }, "note": "\"fox\" has 3 letters. best stays \"quick\". Print quick." }
+  ],
+  "tests": [
+    { "input": "the quick brown fox\n", "expected": "quick", "sample": true, "mistakes": [{"output":"brown","hint":"\"quick\" and \"brown\" are both 5 letters. When there's a tie, keep the first word: replace it only when a word is strictly longer (`>`, not `>=`)."}] },
+    { "input": "hi\n", "expected": "hi", "sample": true },
+    { "input": "a bb ccc dd\n", "expected": "ccc", "sample": false },
+    { "input": "java is fun and easy\n", "expected": "java", "sample": false },
+    { "input": "programming\n", "expected": "programming", "sample": false },
+    { "input": "x yz wxyz uv\n", "expected": "wxyz", "sample": false }
+  ]
+}

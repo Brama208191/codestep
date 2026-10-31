@@ -1,0 +1,37 @@
+{
+  "slug": "find-max",
+  "title": "Find the Biggest Number",
+  "topic": "Arrays",
+  "pattern": "Best so far",
+  "order": 1,
+  "difficulty": 1,
+  "mode": "METHOD",
+  "description": "You are given an array of whole numbers called `nums`. It always has at least one number.\n\nReturn the biggest number in it.\n\nExample: for `nums = [3, 8, 2]` return `8`.",
+  "starterCode": "class Solution {\n    public int findMax(int[] nums) {\n        \n    }\n}\n",
+  "harness": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = in.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = in.nextInt();\n        }\n        System.out.println(new Solution().findMax(nums));\n    }\n}\n",
+  "hints": [
+    "Concept: an array is a row of boxes. `nums[0]` is the first box, `nums.length` is how many boxes there are, and a `for` loop lets you visit every box.",
+    "Approach: remember the biggest number you've seen so far. Start with the first number. Look at each number, and if it's bigger than what you remember, remember it instead.",
+    "Pseudocode:\n  biggest = nums[0]\n  for each number x in nums:\n      if x > biggest:\n          biggest = x\n  return biggest",
+    "Almost there:\n  int biggest = nums[0];\n  for (int i = 0; i < nums.length; i++) {\n      if (nums[i] > biggest) {\n          biggest = ???;\n      }\n  }\n  return biggest;"
+  ],
+  "workedExample": {
+    "title": "Find the Smallest Number",
+    "description": "Return the smallest number in `nums`.",
+    "solution": "class Solution {\n    public int findMin(int[] nums) {\n        int smallest = nums[0];\n        for (int i = 0; i < nums.length; i++) {\n            if (nums[i] < smallest) {\n                smallest = nums[i];\n            }\n        }\n        return smallest;\n    }\n}",
+    "explanation": "This is the **best so far** pattern: one variable remembers the best answer found so far, and the loop keeps improving it.\n\nTo find the smallest, we replace it when we see something *smaller* (`<`). To find the biggest, flip the comparison."
+  },
+  "walkthrough": [
+    { "array": [3, 8, 2], "pointers": { "i": 0 }, "highlight": [0], "vars": { "biggest": 3 }, "note": "Start by remembering the first number: biggest = 3." },
+    { "array": [3, 8, 2], "pointers": { "i": 1 }, "highlight": [1], "vars": { "biggest": 8 }, "note": "8 is bigger than 3, so now remember 8." },
+    { "array": [3, 8, 2], "pointers": { "i": 2 }, "highlight": [1], "vars": { "biggest": 8 }, "note": "2 is not bigger than 8. Keep 8." },
+    { "array": [3, 8, 2], "pointers": {}, "highlight": [1], "vars": { "biggest": 8 }, "note": "Every number has been checked. Return 8." }
+  ],
+  "tests": [
+    { "input": "3\n3 8 2\n", "expected": "8", "display": "nums = [3, 8, 2]", "sample": true, "mistakes": [{"output":"2","hint":"You returned the last number you looked at, not the biggest. Only replace `biggest` when the current number is bigger than it."},{"output":"3","hint":"You returned the first number. Check that the loop visits every number and that `return` comes after the loop, not inside it."}] },
+    { "input": "1\n5\n", "expected": "5", "display": "nums = [5]", "sample": true },
+    { "input": "4\n-5 -2 -9 -3\n", "expected": "-2", "display": "nums = [-5, -2, -9, -3]", "sample": false, "mistakes": [{"output":"0","hint":"Every number here is negative, so none of them beats a starting value of 0. Start `biggest` at `nums[0]` instead of 0."}] },
+    { "input": "5\n1 2 3 4 5\n", "expected": "5", "display": "nums = [1, 2, 3, 4, 5]", "sample": false, "mistakes": [{"output":"4","hint":"You skipped the last number. The loop should run while `i < nums.length`, not `i < nums.length - 1`."}] },
+    { "input": "3\n7 7 7\n", "expected": "7", "display": "nums = [7, 7, 7]", "sample": false }
+  ]
+}

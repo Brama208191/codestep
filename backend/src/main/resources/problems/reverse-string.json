@@ -1,0 +1,38 @@
+{
+  "slug": "reverse-string",
+  "title": "Reverse a String",
+  "topic": "Strings",
+  "pattern": "Build a new result",
+  "order": 11,
+  "difficulty": 1,
+  "mode": "METHOD",
+  "description": "Given a string `s`, return it written backwards.\n\nExample: for `s = \"hello\"` return `\"olleh\"`.\n\nSpaces and other characters are reversed too, just like letters.",
+  "starterCode": "class Solution {\n    public String reverse(String s) {\n        \n    }\n}\n",
+  "harness": "import java.io.BufferedReader;\nimport java.io.IOException;\nimport java.io.InputStreamReader;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));\n        String s = in.readLine();\n        if (s == null) s = \"\";\n        System.out.println(new Solution().reverse(s));\n    }\n}\n",
+  "hints": [
+    "Concept: a string is a sequence of characters, a lot like an array. `s.length()` gives its size and `s.charAt(i)` gives the character at position `i`.",
+    "Approach: walk through the string from the last character to the first, adding each character to a new string as you go. A `StringBuilder` is the efficient way to build a string piece by piece.",
+    "Pseudocode:\n  builder = empty\n  for i from length - 1 down to 0:\n      append s.charAt(i) to builder\n  return builder as a string",
+    "Almost there:\n  StringBuilder sb = new StringBuilder();\n  for (int i = s.length() - 1; i >= 0; i--) {\n      sb.append(???);\n  }\n  return sb.toString();"
+  ],
+  "workedExample": {
+    "title": "Remove All Spaces",
+    "description": "Return `s` with every space character removed. `\"a b c\"` becomes `\"abc\"`.",
+    "solution": "class Solution {\n    public String removeSpaces(String s) {\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < s.length(); i++) {\n            char c = s.charAt(i);\n            if (c != ' ') {\n                sb.append(c);\n            }\n        }\n        return sb.toString();\n    }\n}",
+    "explanation": "Strings in Java can't be changed once created, so the usual pattern is to build a new one with a `StringBuilder`, appending the characters you want.\n\nThis loop goes front to back. For reversing, you'd go back to front instead."
+  },
+  "walkthrough": [
+    { "array": ["h", "e", "l", "l", "o"], "pointers": { "i": 4 }, "highlight": [4], "vars": { "built": "\"o\"" }, "note": "Start at the last position (4). Append 'o'." },
+    { "array": ["h", "e", "l", "l", "o"], "pointers": { "i": 3 }, "highlight": [3, 4], "vars": { "built": "\"ol\"" }, "note": "i = 3: append 'l'." },
+    { "array": ["h", "e", "l", "l", "o"], "pointers": { "i": 2 }, "highlight": [2, 3, 4], "vars": { "built": "\"oll\"" }, "note": "i = 2: append 'l'." },
+    { "array": ["h", "e", "l", "l", "o"], "pointers": { "i": 1 }, "highlight": [1, 2, 3, 4], "vars": { "built": "\"olle\"" }, "note": "i = 1: append 'e'." },
+    { "array": ["h", "e", "l", "l", "o"], "pointers": { "i": 0 }, "highlight": [0, 1, 2, 3, 4], "vars": { "built": "\"olleh\"" }, "note": "i = 0: append 'h'. The loop ends, so return \"olleh\"." }
+  ],
+  "tests": [
+    { "input": "hello\n", "expected": "olleh", "display": "s = \"hello\"", "sample": true, "mistakes": [{"output":"hello","hint":"The text came out in the same order. Start from the last character, `s.length() - 1`, and count down."},{"exception":"StringIndexOutOfBoundsException","hint":"Your loop starts one past the end. The last character is at `s.length() - 1`."}] },
+    { "input": "a\n", "expected": "a", "display": "s = \"a\"", "sample": true },
+    { "input": "racecar\n", "expected": "racecar", "display": "s = \"racecar\"", "sample": false },
+    { "input": "Java 21\n", "expected": "12 avaJ", "display": "s = \"Java 21\"", "sample": false },
+    { "input": "ab\n", "expected": "ba", "display": "s = \"ab\"", "sample": false }
+  ]
+}

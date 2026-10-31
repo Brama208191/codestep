@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: codestep
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["api:8080"]
+        labels:
+          role: api
+      - targets: ["worker:8080"]
+        labels:
+          role: worker

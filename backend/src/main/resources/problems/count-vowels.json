@@ -1,0 +1,38 @@
+{
+  "slug": "count-vowels",
+  "title": "Count the Vowels",
+  "topic": "Strings",
+  "pattern": "Counting",
+  "order": 12,
+  "difficulty": 1,
+  "mode": "METHOD",
+  "description": "Given a string `s`, return how many vowels it contains. The vowels are `a`, `e`, `i`, `o` and `u`, in both lowercase and uppercase.\n\nExample: for `s = \"hello\"` return `2` (`e` and `o`).",
+  "starterCode": "class Solution {\n    public int countVowels(String s) {\n        \n    }\n}\n",
+  "harness": "import java.io.BufferedReader;\nimport java.io.IOException;\nimport java.io.InputStreamReader;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));\n        String s = in.readLine();\n        if (s == null) s = \"\";\n        System.out.println(new Solution().countVowels(s));\n    }\n}\n",
+  "hints": [
+    "Concept: you can look at each character with `s.charAt(i)`. To check whether a character is a vowel, compare it against each vowel, or check whether `\"aeiouAEIOU\"` contains it.",
+    "Approach: keep a counter starting at 0. Visit every character, and add 1 to the counter whenever the character is a vowel.",
+    "Pseudocode:\n  count = 0\n  for each character c in s:\n      if c is one of a, e, i, o, u, A, E, I, O, U:\n          count = count + 1\n  return count",
+    "Almost there:\n  int count = 0;\n  for (int i = 0; i < s.length(); i++) {\n      char c = s.charAt(i);\n      if (\"aeiouAEIOU\".indexOf(c) != -1) {\n          ???\n      }\n  }\n  return count;"
+  ],
+  "workedExample": {
+    "title": "Count the Digits",
+    "description": "Return how many characters in `s` are digits (`0` to `9`).",
+    "solution": "class Solution {\n    public int countDigits(String s) {\n        int count = 0;\n        for (int i = 0; i < s.length(); i++) {\n            char c = s.charAt(i);\n            if (c >= '0' && c <= '9') {\n                count++;\n            }\n        }\n        return count;\n    }\n}",
+    "explanation": "This is the counting pattern again: one counter, one loop, one condition.\n\nThe condition is the only part that changes between problems. Here it checks for a digit. For your problem it needs to check for a vowel."
+  },
+  "walkthrough": [
+    { "array": ["h", "e", "l", "l", "o"], "pointers": { "i": 0 }, "highlight": [], "vars": { "count": 0 }, "note": "'h' is not a vowel. count stays 0." },
+    { "array": ["h", "e", "l", "l", "o"], "pointers": { "i": 1 }, "highlight": [1], "vars": { "count": 1 }, "note": "'e' is a vowel! count becomes 1." },
+    { "array": ["h", "e", "l", "l", "o"], "pointers": { "i": 2 }, "highlight": [1], "vars": { "count": 1 }, "note": "'l' is not a vowel." },
+    { "array": ["h", "e", "l", "l", "o"], "pointers": { "i": 3 }, "highlight": [1], "vars": { "count": 1 }, "note": "'l' is not a vowel." },
+    { "array": ["h", "e", "l", "l", "o"], "pointers": { "i": 4 }, "highlight": [1, 4], "vars": { "count": 2 }, "note": "'o' is a vowel! count becomes 2. Return 2." }
+  ],
+  "tests": [
+    { "input": "hello\n", "expected": "2", "display": "s = \"hello\"", "sample": true },
+    { "input": "sky\n", "expected": "0", "display": "s = \"sky\"", "sample": true },
+    { "input": "AEIOU aeiou\n", "expected": "10", "display": "s = \"AEIOU aeiou\"", "sample": false, "mistakes": [{"output":"5","hint":"Uppercase vowels count too. Check for \"AEIOU\" as well as \"aeiou\"."}] },
+    { "input": "Programming\n", "expected": "3", "display": "s = \"Programming\"", "sample": false },
+    { "input": "\n", "expected": "0", "display": "s = \"\"", "sample": false }
+  ]
+}

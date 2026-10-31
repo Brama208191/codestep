@@ -1,0 +1,35 @@
+{
+  "slug": "all-positive",
+  "title": "Are They All Positive?",
+  "topic": "Arrays",
+  "pattern": "Search & stop early",
+  "order": 7,
+  "difficulty": 1,
+  "mode": "METHOD",
+  "description": "Given an array `nums`, return `true` if every number is positive (bigger than 0), otherwise `false`.\n\n`0` is not positive. An empty array counts as `true`, because nothing in it breaks the rule.\n\nExample: for `nums = [3, 1, 7]` return `true`. For `nums = [3, -1, 7]` return `false`.",
+  "starterCode": "class Solution {\n    public boolean allPositive(int[] nums) {\n        \n    }\n}\n",
+  "harness": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = in.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = in.nextInt();\n        }\n        System.out.println(new Solution().allPositive(nums));\n    }\n}\n",
+  "hints": [
+    "Concept: this is the last problem turned around. Before, one match meant \"yes\". Now, one bad number means \"no\".",
+    "Approach: look for a number that breaks the rule (0 or less). If you find one, return false immediately. If the loop finishes without finding one, every number was fine.",
+    "Pseudocode:\n  for each number x in nums:\n      if x <= 0:\n          return false\n  return true",
+    "Almost there:\n  for (int i = 0; i < nums.length; i++) {\n      if (nums[i] ??? 0) {\n          return false;\n      }\n  }\n  return true;"
+  ],
+  "workedExample": {
+    "title": "Are All Numbers Even?",
+    "description": "Return `true` if every number in `nums` is even.",
+    "solution": "class Solution {\n    public boolean allEven(int[] nums) {\n        for (int i = 0; i < nums.length; i++) {\n            if (nums[i] % 2 != 0) {\n                return false;\n            }\n        }\n        return true;\n    }\n}",
+    "explanation": "To check that **all** items follow a rule, search for one that **breaks** it. Finding one is enough to answer `false`.\n\nIt's the same search-and-stop-early pattern as Is It in the Array?, with true and false swapped."
+  },
+  "walkthrough": [
+    { "array": [3, -1, 7], "pointers": { "i": 0 }, "highlight": [], "vars": {}, "note": "3 is positive. Fine, keep going." },
+    { "array": [3, -1, 7], "pointers": { "i": 1 }, "highlight": [1], "vars": {}, "note": "-1 is not positive! That breaks the rule, so return false right away." }
+  ],
+  "tests": [
+    { "input": "3\n3 1 7\n", "expected": "true", "display": "nums = [3, 1, 7]", "sample": true },
+    { "input": "3\n3 -1 7\n", "expected": "false", "display": "nums = [3, -1, 7]", "sample": true, "mistakes": [{"output":"true","hint":"You returned `true` after checking only the first number. You can only say \"all positive\" after checking every number, so put `return true` after the loop."}] },
+    { "input": "2\n5 0\n", "expected": "false", "display": "nums = [5, 0]", "sample": false, "mistakes": [{"output":"true","hint":"0 is not positive. Check for `nums[i] <= 0`, not just `< 0`."}] },
+    { "input": "0\n\n", "expected": "true", "display": "nums = []", "sample": false },
+    { "input": "1\n1\n", "expected": "true", "display": "nums = [1]", "sample": false }
+  ]
+}

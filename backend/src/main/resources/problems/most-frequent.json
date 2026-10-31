@@ -1,0 +1,39 @@
+{
+  "slug": "most-frequent",
+  "title": "Most Common Number",
+  "topic": "HashMap",
+  "pattern": "Counting with a map",
+  "order": 16,
+  "difficulty": 3,
+  "mode": "METHOD",
+  "description": "Given a non-empty array `nums`, return the number that appears the most times.\n\nIf there's a tie, return the smallest of the tied numbers.\n\nExample: for `nums = [1, 3, 3, 2]` return `3`. For `nums = [4, 4, 1, 1]` both appear twice, so return the smaller one, `1`.",
+  "starterCode": "class Solution {\n    public int mostFrequent(int[] nums) {\n        \n    }\n}\n",
+  "harness": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = in.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = in.nextInt();\n        }\n        System.out.println(new Solution().mostFrequent(nums));\n    }\n}\n",
+  "hints": [
+    "Concept: a `HashMap` stores pairs of key → value. Here the key is a number and the value is how many times you've seen it. `map.getOrDefault(x, 0)` reads a count safely even if `x` hasn't been seen yet.",
+    "Approach: do it in two steps. First, go through `nums` and build the counts. Second, go through the map and pick the number with the highest count, using the smaller number when counts are equal.",
+    "Pseudocode:\n  counts = empty map\n  for each x in nums:\n      counts[x] = counts[x] + 1   (starting from 0)\n  best = none, bestCount = 0\n  for each (number, count) in counts:\n      if count > bestCount, or (count == bestCount and number < best):\n          best = number, bestCount = count\n  return best",
+    "Almost there:\n  Map<Integer, Integer> counts = new HashMap<>();\n  for (int x : nums) {\n      counts.put(x, counts.getOrDefault(x, 0) + 1);\n  }\n  int best = 0, bestCount = 0;\n  for (Map.Entry<Integer, Integer> e : counts.entrySet()) {\n      int number = e.getKey(), count = e.getValue();\n      if (???) {\n          best = number;\n          bestCount = count;\n      }\n  }\n  return best;"
+  ],
+  "workedExample": {
+    "title": "Count Each Letter",
+    "description": "Return how many times the letter `c` appears in the word, using a map of all letter counts.",
+    "solution": "import java.util.HashMap;\nimport java.util.Map;\n\nclass Solution {\n    public int countOf(String word, char c) {\n        Map<Character, Integer> counts = new HashMap<>();\n        for (int i = 0; i < word.length(); i++) {\n            char letter = word.charAt(i);\n            counts.put(letter, counts.getOrDefault(letter, 0) + 1);\n        }\n        return counts.getOrDefault(c, 0);\n    }\n}",
+    "explanation": "`counts.put(letter, counts.getOrDefault(letter, 0) + 1)` is the standard way to count things with a map: read the current count (0 if new), add one, and store it back.\n\nYour problem uses the same counting loop on numbers, then adds a second loop to find the highest count."
+  },
+  "walkthrough": [
+    { "array": [1, 3, 3, 2], "pointers": { "i": 0 }, "highlight": [0], "vars": { "counts": "{1: 1}" }, "note": "Count 1. It's new, so its count becomes 1." },
+    { "array": [1, 3, 3, 2], "pointers": { "i": 1 }, "highlight": [1], "vars": { "counts": "{1: 1, 3: 1}" }, "note": "Count 3. New, so its count becomes 1." },
+    { "array": [1, 3, 3, 2], "pointers": { "i": 2 }, "highlight": [1, 2], "vars": { "counts": "{1: 1, 3: 2}" }, "note": "3 again. Its count goes up to 2." },
+    { "array": [1, 3, 3, 2], "pointers": { "i": 3 }, "highlight": [3], "vars": { "counts": "{1: 1, 3: 2, 2: 1}" }, "note": "Count 2. New, so its count becomes 1." },
+    { "array": [1, 3, 3, 2], "pointers": {}, "highlight": [1, 2], "vars": { "best": 3, "bestCount": 2 }, "note": "Now look through the map: 3 has the highest count (2). Return 3." }
+  ],
+  "tests": [
+    { "input": "4\n1 3 3 2\n", "expected": "3", "display": "nums = [1, 3, 3, 2]", "sample": true },
+    { "input": "4\n4 4 1 1\n", "expected": "1", "display": "nums = [4, 4, 1, 1]", "sample": true, "mistakes": [{"output":"4","hint":"4 and 1 both appear twice. On a tie, return the smaller number."}] },
+    { "input": "1\n7\n", "expected": "7", "display": "nums = [7]", "sample": false },
+    { "input": "7\n5 5 5 2 2 2 2\n", "expected": "2", "display": "nums = [5, 5, 5, 2, 2, 2, 2]", "sample": false },
+    { "input": "3\n-1 -1 0\n", "expected": "-1", "display": "nums = [-1, -1, 0]", "sample": false },
+    { "input": "6\n9 8 7 9 8 7\n", "expected": "7", "display": "nums = [9, 8, 7, 9, 8, 7]", "sample": false }
+  ]
+}

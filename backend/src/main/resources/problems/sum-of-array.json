@@ -1,0 +1,39 @@
+{
+  "slug": "sum-of-array",
+  "title": "Sum of an Array",
+  "topic": "Arrays",
+  "pattern": "Running total",
+  "order": 3,
+  "difficulty": 1,
+  "mode": "METHOD",
+  "description": "You are given an array of whole numbers called `nums`. Return the total of all the numbers added together.\n\nIf the array is empty, the total is `0`.\n\nExample: for `nums = [1, 2, 3]` the answer is `6`, because 1 + 2 + 3 = 6.\n\nYou only need to finish the `sum` method. We handle reading the input and printing your answer.",
+  "starterCode": "class Solution {\n    public int sum(int[] nums) {\n        \n    }\n}\n",
+  "harness": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = in.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = in.nextInt();\n        }\n        System.out.println(new Solution().sum(nums));\n    }\n}\n",
+  "hints": [
+    "Concept: an array is a row of boxes, each holding one number. You can visit every box with a loop, using `nums[i]` to read the box at position `i`.",
+    "Approach: keep a running total that starts at 0. Visit each number once and add it to the total. When the loop ends, the total is your answer.",
+    "Pseudocode:\n  total = 0\n  for each position i from 0 to length - 1:\n      total = total + nums[i]\n  return total",
+    "Almost there:\n  int total = 0;\n  for (int i = 0; i < nums.length; i++) {\n      total += ???;\n  }\n  return total;"
+  ],
+  "workedExample": {
+    "title": "Multiply Everything Together",
+    "description": "Given an array `nums`, return all the numbers multiplied together. For `[2, 3, 4]` the answer is `24`.",
+    "solution": "class Solution {\n    public int product(int[] nums) {\n        int result = 1;\n        for (int i = 0; i < nums.length; i++) {\n            result = result * nums[i];\n        }\n        return result;\n    }\n}",
+    "explanation": "This is the **running total** pattern: one variable collects a result while the loop visits every element.\n\nFor multiplying, it starts at 1 (multiplying by 1 changes nothing). For adding, start at 0 (adding 0 changes nothing) and use `+` instead of `*`."
+  },
+  "walkthrough": [
+    { "array": [1, 2, 3], "pointers": {}, "highlight": [], "vars": { "total": 0 }, "note": "Start with total = 0. Nothing has been added yet." },
+    { "array": [1, 2, 3], "pointers": { "i": 0 }, "highlight": [0], "vars": { "total": 1 }, "note": "i = 0: add nums[0] = 1. total becomes 0 + 1 = 1." },
+    { "array": [1, 2, 3], "pointers": { "i": 1 }, "highlight": [1], "vars": { "total": 3 }, "note": "i = 1: add nums[1] = 2. total becomes 1 + 2 = 3." },
+    { "array": [1, 2, 3], "pointers": { "i": 2 }, "highlight": [2], "vars": { "total": 6 }, "note": "i = 2: add nums[2] = 3. total becomes 3 + 3 = 6." },
+    { "array": [1, 2, 3], "pointers": {}, "highlight": [0, 1, 2], "vars": { "total": 6 }, "note": "i = 3 is not less than the length (3), so the loop stops. Return 6." }
+  ],
+  "tests": [
+    { "input": "3\n1 2 3\n", "expected": "6", "display": "nums = [1, 2, 3]", "sample": true, "mistakes": [{"output":"3","hint":"You stopped one number early. Use `i < nums.length` so the last number is included."},{"exception":"ArrayIndexOutOfBoundsException","hint":"The loop goes one step too far. With `i <= nums.length`, the last pass reads a position that doesn't exist. Use `i < nums.length`."}] },
+    { "input": "1\n5\n", "expected": "5", "display": "nums = [5]", "sample": true },
+    { "input": "0\n\n", "expected": "0", "display": "nums = []", "sample": false, "mistakes": [{"exception":"ArrayIndexOutOfBoundsException","hint":"This array is empty, so `nums[0]` doesn't exist. Start `total` at 0 instead of the first number."}] },
+    { "input": "3\n-4 10 -6\n", "expected": "0", "display": "nums = [-4, 10, -6]", "sample": false },
+    { "input": "8\n7 7 7 7 7 7 7 7\n", "expected": "56", "display": "nums = [7, 7, 7, 7, 7, 7, 7, 7]", "sample": false },
+    { "input": "5\n100 -1 0 25 3\n", "expected": "127", "display": "nums = [100, -1, 0, 25, 3]", "sample": false }
+  ]
+}

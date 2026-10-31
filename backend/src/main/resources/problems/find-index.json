@@ -1,0 +1,36 @@
+{
+  "slug": "find-index",
+  "title": "Find a Number's Position",
+  "topic": "Arrays",
+  "pattern": "Search & stop early",
+  "order": 9,
+  "difficulty": 2,
+  "mode": "METHOD",
+  "description": "Given an array `nums` and a number `target`, return the position (index) where `target` first appears.\n\nIf `target` isn't in the array, return `-1`.\n\nExample: for `nums = [4, 8, 15]` and `target = 8`, return `1`, because `nums[1]` is 8.",
+  "starterCode": "class Solution {\n    public int indexOf(int[] nums, int target) {\n        \n    }\n}\n",
+  "harness": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = in.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = in.nextInt();\n        }\n        int target = in.nextInt();\n        System.out.println(new Solution().indexOf(nums, target));\n    }\n}\n",
+  "hints": [
+    "Concept: this is called a linear search. You check each element one at a time, from the start, until you find what you're looking for.",
+    "Approach: loop through the positions. As soon as `nums[i]` equals `target`, you've found the first one, so return `i` right away. If the loop finishes without finding it, it isn't there.",
+    "Pseudocode:\n  for i from 0 to n - 1:\n      if nums[i] == target:\n          return i\n  return -1",
+    "Almost there:\n  for (int i = 0; i < nums.length; i++) {\n      if (???) {\n          return i;\n      }\n  }\n  return ???;"
+  ],
+  "workedExample": {
+    "title": "Does the Array Contain a Negative?",
+    "description": "Return `true` if any number in `nums` is below zero, otherwise `false`.",
+    "solution": "class Solution {\n    public boolean hasNegative(int[] nums) {\n        for (int i = 0; i < nums.length; i++) {\n            if (nums[i] < 0) {\n                return true;\n            }\n        }\n        return false;\n    }\n}",
+    "explanation": "`return` inside a loop ends the method immediately, so there's no need to keep looking once the answer is known.\n\nThe `return false` after the loop only runs if the loop checked everything and found nothing. Your problem has the same shape: return early when you find the target, and return a \"not found\" value after the loop."
+  },
+  "walkthrough": [
+    { "array": [4, 8, 15], "pointers": { "i": 0 }, "highlight": [], "vars": { "target": 8 }, "note": "i = 0: nums[0] is 4. Not 8, keep going." },
+    { "array": [4, 8, 15], "pointers": { "i": 1 }, "highlight": [1], "vars": { "target": 8 }, "note": "i = 1: nums[1] is 8. Found it! Return 1 immediately." },
+    { "array": [4, 8, 15], "pointers": {}, "highlight": [], "vars": { "target": 99 }, "note": "If target were 99, the loop would check all three numbers without a match, and you'd return -1 after the loop." }
+  ],
+  "tests": [
+    { "input": "3\n4 8 15\n8\n", "expected": "1", "display": "nums = [4, 8, 15], target = 8", "sample": true, "mistakes": [{"output":"-1","hint":"You returned -1 as soon as the first number didn't match. Only return -1 after the loop has checked everything."}] },
+    { "input": "3\n1 2 3\n7\n", "expected": "-1", "display": "nums = [1, 2, 3], target = 7", "sample": true },
+    { "input": "3\n5 5 5\n5\n", "expected": "0", "display": "nums = [5, 5, 5], target = 5", "sample": false, "mistakes": [{"output":"2","hint":"You returned the last match. Return as soon as you find the first one."}] },
+    { "input": "0\n\n3\n", "expected": "-1", "display": "nums = [], target = 3", "sample": false },
+    { "input": "5\n2 4 6 8 10\n10\n", "expected": "4", "display": "nums = [2, 4, 6, 8, 10], target = 10", "sample": false }
+  ]
+}

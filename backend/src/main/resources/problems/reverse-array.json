@@ -1,0 +1,38 @@
+{
+  "slug": "reverse-array",
+  "title": "Reverse an Array",
+  "topic": "Arrays",
+  "pattern": "Build a new result",
+  "order": 8,
+  "difficulty": 1,
+  "mode": "METHOD",
+  "description": "Given an array `nums`, return a new array with the same numbers in the opposite order.\n\nExample: for `nums = [1, 2, 3]` return `[3, 2, 1]`.\n\nIf the array is empty, return an empty array.",
+  "starterCode": "class Solution {\n    public int[] reverse(int[] nums) {\n        \n    }\n}\n",
+  "harness": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = in.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = in.nextInt();\n        }\n        int[] result = new Solution().reverse(nums);\n        StringBuilder out = new StringBuilder();\n        for (int i = 0; i < result.length; i++) {\n            if (i > 0) out.append(' ');\n            out.append(result[i]);\n        }\n        System.out.println(out);\n    }\n}\n",
+  "hints": [
+    "Concept: you can create a new array of the same size with `new int[nums.length]`. The last position of an array is `nums.length - 1`.",
+    "Approach: the first number of the answer is the last number of `nums`, the second is the second-to-last, and so on. Fill the new array from the front while reading `nums` from the back.",
+    "Pseudocode:\n  result = new array of size n\n  for i from 0 to n - 1:\n      result[i] = nums[n - 1 - i]\n  return result",
+    "Almost there:\n  int n = nums.length;\n  int[] result = new int[n];\n  for (int i = 0; i < n; i++) {\n      result[i] = nums[???];\n  }\n  return result;"
+  ],
+  "workedExample": {
+    "title": "Double Every Number",
+    "description": "Given `nums`, return a new array where each number is doubled.",
+    "solution": "class Solution {\n    public int[] doubled(int[] nums) {\n        int[] result = new int[nums.length];\n        for (int i = 0; i < nums.length; i++) {\n            result[i] = nums[i] * 2;\n        }\n        return result;\n    }\n}",
+    "explanation": "The method builds a brand new array the same size as the input, then fills it one position at a time.\n\nHere position `i` of the result comes from position `i` of the input. In your problem, position `i` of the result comes from a different position of the input. Work out which one."
+  },
+  "walkthrough": [
+    { "array": [1, 2, 3, 4], "pointers": {}, "highlight": [], "vars": { "result": "[_, _, _, _]" }, "note": "Create an empty result array with 4 slots." },
+    { "array": [1, 2, 3, 4], "pointers": { "n-1-i": 3 }, "highlight": [3], "vars": { "i": 0, "result": "[4, _, _, _]" }, "note": "i = 0: copy nums[3] = 4 into result[0]." },
+    { "array": [1, 2, 3, 4], "pointers": { "n-1-i": 2 }, "highlight": [2], "vars": { "i": 1, "result": "[4, 3, _, _]" }, "note": "i = 1: copy nums[2] = 3 into result[1]." },
+    { "array": [1, 2, 3, 4], "pointers": { "n-1-i": 1 }, "highlight": [1], "vars": { "i": 2, "result": "[4, 3, 2, _]" }, "note": "i = 2: copy nums[1] = 2 into result[2]." },
+    { "array": [1, 2, 3, 4], "pointers": { "n-1-i": 0 }, "highlight": [0], "vars": { "i": 3, "result": "[4, 3, 2, 1]" }, "note": "i = 3: copy nums[0] = 1 into result[3]. Done!" }
+  ],
+  "tests": [
+    { "input": "3\n1 2 3\n", "expected": "3 2 1", "display": "nums = [1, 2, 3]", "sample": true, "mistakes": [{"output":"1 2 3","hint":"The order didn't change. If you swap in place, only go halfway; going all the way swaps every pair twice. Or fill a new array from the back."},{"exception":"ArrayIndexOutOfBoundsException","hint":"One of your positions is off by one. The last valid index is `nums.length - 1`, so the mirror of position `i` is `nums.length - 1 - i`."}] },
+    { "input": "1\n7\n", "expected": "7", "display": "nums = [7]", "sample": true },
+    { "input": "0\n\n", "expected": "", "display": "nums = []", "sample": false },
+    { "input": "4\n5 -1 0 9\n", "expected": "9 0 -1 5", "display": "nums = [5, -1, 0, 9]", "sample": false },
+    { "input": "2\n1 2\n", "expected": "2 1", "display": "nums = [1, 2]", "sample": false }
+  ]
+}

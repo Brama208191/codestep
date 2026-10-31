@@ -1,0 +1,37 @@
+{
+  "slug": "count-target",
+  "title": "How Many Times?",
+  "topic": "Arrays",
+  "pattern": "Counting",
+  "order": 4,
+  "difficulty": 1,
+  "mode": "METHOD",
+  "description": "Given an array `nums` and a number `target`, return how many times `target` appears in the array.\n\nExample: for `nums = [2, 5, 2, 7]` and `target = 2`, return `2`.",
+  "starterCode": "class Solution {\n    public int countTarget(int[] nums, int target) {\n        \n    }\n}\n",
+  "harness": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = in.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = in.nextInt();\n        }\n        int target = in.nextInt();\n        System.out.println(new Solution().countTarget(nums, target));\n    }\n}\n",
+  "hints": [
+    "Concept: a counter is a variable that starts at 0 and goes up by 1 each time something happens. `count++` adds 1 to `count`.",
+    "Approach: look at every number. When it equals `target`, add 1 to the counter. Return the counter at the end.",
+    "Pseudocode:\n  count = 0\n  for each number x in nums:\n      if x == target:\n          count = count + 1\n  return count",
+    "Almost there:\n  int count = 0;\n  for (int i = 0; i < nums.length; i++) {\n      if (nums[i] == target) {\n          ???\n      }\n  }\n  return count;"
+  ],
+  "workedExample": {
+    "title": "Count the Zeros",
+    "description": "Return how many numbers in `nums` are exactly 0.",
+    "solution": "class Solution {\n    public int countZeros(int[] nums) {\n        int count = 0;\n        for (int i = 0; i < nums.length; i++) {\n            if (nums[i] == 0) {\n                count++;\n            }\n        }\n        return count;\n    }\n}",
+    "explanation": "This is the **counting** pattern: a counter starting at 0, a loop over everything, and an `if` that decides what to count.\n\nOnly the condition inside the `if` changes from problem to problem. Note that `==` compares two values, while `=` stores a value."
+  },
+  "walkthrough": [
+    { "array": [2, 5, 2, 7], "pointers": { "i": 0 }, "highlight": [0], "vars": { "target": 2, "count": 1 }, "note": "nums[0] is 2, which matches the target. count becomes 1." },
+    { "array": [2, 5, 2, 7], "pointers": { "i": 1 }, "highlight": [0], "vars": { "target": 2, "count": 1 }, "note": "5 doesn't match. count stays 1." },
+    { "array": [2, 5, 2, 7], "pointers": { "i": 2 }, "highlight": [0, 2], "vars": { "target": 2, "count": 2 }, "note": "2 matches again. count becomes 2." },
+    { "array": [2, 5, 2, 7], "pointers": { "i": 3 }, "highlight": [0, 2], "vars": { "target": 2, "count": 2 }, "note": "7 doesn't match. Done, so return 2." }
+  ],
+  "tests": [
+    { "input": "4\n2 5 2 7\n2\n", "expected": "2", "display": "nums = [2, 5, 2, 7], target = 2", "sample": true, "mistakes": [{"output":"1","hint":"You stopped counting after the first match. Don't `return` inside the loop; keep counting and return after it."},{"output":"4","hint":"You counted every number. Only add 1 when `nums[i] == target`."}] },
+    { "input": "3\n1 2 3\n9\n", "expected": "0", "display": "nums = [1, 2, 3], target = 9", "sample": true },
+    { "input": "4\n4 4 4 4\n4\n", "expected": "4", "display": "nums = [4, 4, 4, 4], target = 4", "sample": false },
+    { "input": "0\n\n1\n", "expected": "0", "display": "nums = [], target = 1", "sample": false },
+    { "input": "5\n-1 0 -1 1 -1\n-1\n", "expected": "3", "display": "nums = [-1, 0, -1, 1, -1], target = -1", "sample": false }
+  ]
+}

@@ -1,0 +1,103 @@
+x-backend-env: &backend-env
+  DB_URL: jdbc:postgresql://postgres:5432/codestep
+  DB_USER: codestep
+  DB_PASSWORD: ${POSTGRES_PASSWORD:-codestep}
+  REDIS_HOST: redis
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: codestep
+      POSTGRES_USER: codestep
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-codestep}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U codestep -d codestep"]
+      interval: 5s
+      retries: 10
+    mem_limit: 256m
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "64mb"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+    mem_limit: 96m
+    restart: unless-stopped
+
+  runner:
+    build: ./runner
+    image: codestep-runner:latest
+    entrypoint: ["true"]
+
+  api:
+    build: ./backend
+    image: codestep-backend:latest
+    environment:
+      <<: *backend-env
+      CODESTEP_WORKER_ENABLED: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    mem_limit: 384m
+    restart: unless-stopped
+
+  worker:
+    build: ./backend
+    image: codestep-backend:latest
+    environment:
+      <<: *backend-env
+      CODESTEP_API_ENABLED: "false"
+      CODESTEP_WORKER_THREADS: "2"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      api:
+        condition: service_started
+      runner:
+        condition: service_completed_successfully
+    mem_limit: 384m
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    mem_limit: 64m
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    profiles: ["monitoring"]
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:11.2.2
+    profiles: ["monitoring"]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./monitoring/grafana:/etc/grafana/provisioning:ro
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres-data:
+  redis-data:

@@ -1,0 +1,39 @@
+{
+  "slug": "is-palindrome",
+  "title": "Is It a Palindrome?",
+  "topic": "Strings",
+  "pattern": "Two pointers",
+  "order": 13,
+  "difficulty": 2,
+  "mode": "METHOD",
+  "description": "A palindrome reads the same forwards and backwards, like `\"racecar\"` or `\"abba\"`.\n\nGiven a string `s`, return `true` if it's a palindrome and `false` otherwise.\n\nUppercase and lowercase count as different: `\"Abba\"` is not a palindrome. An empty string counts as a palindrome.",
+  "starterCode": "class Solution {\n    public boolean isPalindrome(String s) {\n        \n    }\n}\n",
+  "harness": "import java.io.BufferedReader;\nimport java.io.IOException;\nimport java.io.InputStreamReader;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));\n        String s = in.readLine();\n        if (s == null) s = \"\";\n        System.out.println(new Solution().isPalindrome(s));\n    }\n}\n",
+  "hints": [
+    "Concept: the two pointers technique. Use one position that starts at the beginning and another that starts at the end, and move them toward each other.",
+    "Approach: compare the character at the left position with the one at the right. If they ever differ, it's not a palindrome. If the positions meet without a mismatch, it is. (Reversing the string and comparing also works; two pointers just avoids building a new string.)",
+    "Pseudocode:\n  left = 0, right = length - 1\n  while left < right:\n      if s[left] != s[right]: return false\n      left = left + 1\n      right = right - 1\n  return true",
+    "Almost there:\n  int left = 0;\n  int right = s.length() - 1;\n  while (left < right) {\n      if (s.charAt(left) != s.charAt(right)) {\n          return false;\n      }\n      ???\n      ???\n  }\n  return true;"
+  ],
+  "workedExample": {
+    "title": "Are Two Arrays Mirror Images?",
+    "description": "Return `true` if array `b` is exactly array `a` reversed. Both arrays have the same length.",
+    "solution": "class Solution {\n    public boolean isMirror(int[] a, int[] b) {\n        int n = a.length;\n        for (int i = 0; i < n; i++) {\n            if (a[i] != b[n - 1 - i]) {\n                return false;\n            }\n        }\n        return true;\n    }\n}",
+    "explanation": "Each element of `a` is compared with the matching element counted from the end of `b`. One mismatch is enough to return `false`.\n\nA palindrome check is the same idea, but you compare a string against itself, front against back."
+  },
+  "walkthrough": [
+    { "array": ["r", "a", "c", "e", "c", "a", "r"], "pointers": { "left": 0, "right": 6 }, "highlight": [0, 6], "vars": {}, "note": "Compare s[0] = 'r' with s[6] = 'r'. They match, so move both pointers inward." },
+    { "array": ["r", "a", "c", "e", "c", "a", "r"], "pointers": { "left": 1, "right": 5 }, "highlight": [1, 5], "vars": {}, "note": "Compare 'a' with 'a'. They match." },
+    { "array": ["r", "a", "c", "e", "c", "a", "r"], "pointers": { "left": 2, "right": 4 }, "highlight": [2, 4], "vars": {}, "note": "Compare 'c' with 'c'. They match." },
+    { "array": ["r", "a", "c", "e", "c", "a", "r"], "pointers": { "left": 3, "right": 3 }, "highlight": [3], "vars": {}, "note": "left and right meet at the middle. No mismatches were found, so return true." }
+  ],
+  "tests": [
+    { "input": "racecar\n", "expected": "true", "display": "s = \"racecar\"", "sample": true },
+    { "input": "hello\n", "expected": "false", "display": "s = \"hello\"", "sample": true },
+    { "input": "a\n", "expected": "true", "display": "s = \"a\"", "sample": false },
+    { "input": "abba\n", "expected": "true", "display": "s = \"abba\"", "sample": false },
+    { "input": "Abba\n", "expected": "false", "display": "s = \"Abba\"", "sample": false, "mistakes": [{"output":"true","hint":"Uppercase and lowercase are different here: 'A' is not the same as 'a', so \"Abba\" is not a palindrome. Don't change the case."}] },
+    { "input": "\n", "expected": "true", "display": "s = \"\"", "sample": false },
+    { "input": "abca\n", "expected": "false", "display": "s = \"abca\"", "sample": false }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "slug": "two-sum",
+  "title": "Pair That Adds Up",
+  "topic": "HashMap",
+  "pattern": "Remember what you have seen",
+  "order": 17,
+  "difficulty": 3,
+  "mode": "PROGRAM",
+  "description": "Write the whole program. Read the input however you like.\n\nThe input has three lines:\n\n1. a number `n`\n2. `n` whole numbers separated by spaces\n3. a number `target`\n\nExactly one pair of different positions `i < j` has numbers that add up to `target`. Print `i` and `j` separated by a space.\n\nExample input:\n```\n4\n2 7 11 15\n9\n```\nExpected output: `0 1` (2 + 7 = 9).",
+  "starterCode": "public class Main {\n    public static void main(String[] args) {\n        \n    }\n}\n",
+  "harness": null,
+  "hints": [
+    "Concept: if the current number is `x`, the partner you need is `target - x`. A `HashMap` from number → position can tell you instantly whether that partner appeared earlier, and where.",
+    "Approach: a first version with two nested loops (try every pair) is completely fine for these inputs. For the faster version, go through the numbers once: before storing each number, check whether its partner is already in the map.",
+    "Pseudocode:\n  read n, nums, target\n  positions = empty map\n  for j from 0 to n - 1:\n      need = target - nums[j]\n      if positions contains need:\n          print positions[need], j\n          stop\n      positions[nums[j]] = j",
+    "Almost there (the map version):\n  Map<Integer, Integer> positions = new HashMap<>();\n  for (int j = 0; j < n; j++) {\n      int need = target - nums[j];\n      if (positions.containsKey(need)) {\n          System.out.println(??? + \" \" + j);\n          return;\n      }\n      positions.put(nums[j], j);\n  }"
+  ],
+  "workedExample": {
+    "title": "Does a Pair Sum to Zero?",
+    "description": "Read `n` and `n` numbers. Print `yes` if some two different positions add up to 0, otherwise `no`.",
+    "solution": "import java.util.HashSet;\nimport java.util.Scanner;\nimport java.util.Set;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = in.nextInt();\n        Set<Integer> seen = new HashSet<>();\n        for (int i = 0; i < n; i++) {\n            int x = in.nextInt();\n            if (seen.contains(-x)) {\n                System.out.println(\"yes\");\n                return;\n            }\n            seen.add(x);\n        }\n        System.out.println(\"no\");\n    }\n}",
+    "explanation": "For each number `x`, the partner that makes 0 is `-x`. Checking the set before adding `x` ensures we never pair a number with itself.\n\nYour problem has the same idea with partner `target - x`. Because you also need positions, use a map from number → index instead of a set."
+  },
+  "walkthrough": [
+    { "array": [2, 7, 11, 15], "pointers": { "j": 0 }, "highlight": [0], "vars": { "target": 9, "need": 7, "positions": "{2: 0}" }, "note": "j = 0: we need 9 - 2 = 7. It isn't in the map yet, so store 2 → 0." },
+    { "array": [2, 7, 11, 15], "pointers": { "j": 1 }, "highlight": [0, 1], "vars": { "target": 9, "need": 2, "positions": "{2: 0}" }, "note": "j = 1: we need 9 - 7 = 2. The map has 2 at position 0. Print 0 1." }
+  ],
+  "tests": [
+    { "input": "4\n2 7 11 15\n9\n", "expected": "0 1", "sample": true },
+    { "input": "3\n3 2 4\n6\n", "expected": "1 2", "sample": true, "mistakes": [{"output":"0 0","hint":"You paired a number with itself. The two positions must be different: start the second loop at `i + 1`, or check the map before adding the current number."}] },
+    { "input": "2\n3 3\n6\n", "expected": "0 1", "sample": false },
+    { "input": "4\n1 5 8 10\n18\n", "expected": "2 3", "sample": false },
+    { "input": "4\n-3 4 3 90\n0\n", "expected": "0 2", "sample": false }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "slug": "contains-number",
+  "title": "Is It in the Array?",
+  "topic": "Arrays",
+  "pattern": "Search & stop early",
+  "order": 6,
+  "difficulty": 1,
+  "mode": "METHOD",
+  "description": "Given an array `nums` and a number `target`, return `true` if `target` is somewhere in the array, otherwise `false`.\n\nExample: for `nums = [4, 9, 1]` and `target = 9`, return `true`.",
+  "starterCode": "class Solution {\n    public boolean contains(int[] nums, int target) {\n        \n    }\n}\n",
+  "harness": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = in.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = in.nextInt();\n        }\n        int target = in.nextInt();\n        System.out.println(new Solution().contains(nums, target));\n    }\n}\n",
+  "hints": [
+    "Concept: `return` ends the method immediately, even in the middle of a loop. `boolean` means the answer is `true` or `false`.",
+    "Approach: check each number. The moment you find `target`, you know the answer is true, so return it straight away. If the loop finishes without finding it, the answer is false.",
+    "Pseudocode:\n  for each number x in nums:\n      if x == target:\n          return true\n  return false",
+    "Almost there:\n  for (int i = 0; i < nums.length; i++) {\n      if (nums[i] == target) {\n          return ???;\n      }\n  }\n  return ???;"
+  ],
+  "workedExample": {
+    "title": "Is There a Zero?",
+    "description": "Return `true` if any number in `nums` is 0.",
+    "solution": "class Solution {\n    public boolean hasZero(int[] nums) {\n        for (int i = 0; i < nums.length; i++) {\n            if (nums[i] == 0) {\n                return true;\n            }\n        }\n        return false;\n    }\n}",
+    "explanation": "This is the **search and stop early** pattern. You don't need to look at the rest of the array once you've found what you want.\n\nThe `return false` after the loop only runs if nothing matched."
+  },
+  "walkthrough": [
+    { "array": [4, 9, 1], "pointers": { "i": 0 }, "highlight": [], "vars": { "target": 9 }, "note": "4 isn't 9. Keep looking." },
+    { "array": [4, 9, 1], "pointers": { "i": 1 }, "highlight": [1], "vars": { "target": 9 }, "note": "Found 9! Return true right away. We never even look at 1." }
+  ],
+  "tests": [
+    { "input": "3\n4 9 1\n9\n", "expected": "true", "display": "nums = [4, 9, 1], target = 9", "sample": true, "mistakes": [{"output":"false","hint":"You returned `false` as soon as the first number didn't match. You can only say \"not found\" after checking every number, so put `return false` after the loop."}] },
+    { "input": "3\n4 9 1\n5\n", "expected": "false", "display": "nums = [4, 9, 1], target = 5", "sample": true },
+    { "input": "0\n\n3\n", "expected": "false", "display": "nums = [], target = 3", "sample": false },
+    { "input": "1\n-2\n-2\n", "expected": "true", "display": "nums = [-2], target = -2", "sample": false },
+    { "input": "5\n1 2 3 4 5\n5\n", "expected": "true", "display": "nums = [1, 2, 3, 4, 5], target = 5", "sample": false }
+  ]
+}
