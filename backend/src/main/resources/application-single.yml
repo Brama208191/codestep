@@ -1,0 +1,46 @@
+# One container with no Docker and no Redis, as on Railway. Activated by the Railway image.
+
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+  datasource:
+    hikari:
+      # An open connection counts as traffic and would keep the app and database from sleeping.
+      minimum-idle: 0
+      idle-timeout: 60000
+
+  web:
+    resources:
+      # Jar entries all carry a 1980 timestamp, so Last-Modified would answer "304" across deploys
+      # and leave browsers on an old index.html whose bundles are gone. Content-hashed bundles under
+      # /assets are cached for a year instead (StaticAssetsConfig).
+      cache:
+        use-last-modified: false
+        cachecontrol:
+          no-cache: true
+
+server:
+  forward-headers-strategy: native
+  # nginx compressed responses in docker-compose; here the app serves the bundles itself.
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,text/javascript,application/javascript,application/json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+codestep:
+  queue: memory
+  api:
+    max-queued: ${CODESTEP_MAX_QUEUED:30}
+  worker:
+    threads: ${CODESTEP_WORKER_THREADS:1}
+
+judge:
+  mode: local

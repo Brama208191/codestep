@@ -115,6 +115,24 @@
                             <goal>verify</goal>
                         </goals>
                     </execution>
+                    <!-- The judge suites again, against the single-container judge used on Railway. -->
+                    <execution>
+                        <id>single-container-judge</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/judge/*IT.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <judge.sandbox>local</judge.sandbox>
+                            </systemPropertyVariables>
+                            <reportsDirectory>${project.build.directory}/failsafe-reports-single-container</reportsDirectory>
+                            <summaryFile>${project.build.directory}/failsafe-reports-single-container/failsafe-summary.xml</summaryFile>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

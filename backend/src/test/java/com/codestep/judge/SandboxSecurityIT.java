@@ -142,4 +142,71 @@ class SandboxSecurityIT {
 
         assertThat(result.verdict()).isEqualTo(Verdict.ACCEPTED);
     }
+
+    // The cases below matter most for the single-container judge, where submissions share a
+    // machine with the API. They run against both judges.
+
+    @Test
+    void environmentVariablesAreHidden() {
+        assertBlocked("System.getenv();");
+    }
+
+    @Test
+    void otherFilesCannotBeRead() {
+        assertBlocked("java.nio.file.Files.readString(java.nio.file.Path.of(\"/etc/passwd\"));");
+    }
+
+    @Test
+    void processesCannotBeStarted() {
+        assertBlocked("new ProcessBuilder(\"sh\", \"-c\", \"id\").start();");
+    }
+
+    @Test
+    void theSecurityManagerCannotBeRemoved() {
+        assertBlocked("System.setSecurityManager(null);");
+    }
+
+    @Test
+    void privateJdkInternalsStayClosed() {
+        assertBlocked("Class.forName(\"java.lang.System\").getDeclaredField(\"out\").setAccessible(true);");
+    }
+
+    @Test
+    void aThreadBombFailsAndTheJudgeKeepsWorking() {
+        SubmissionResult bomb = run("find-max", """
+                class Solution {
+                    public int findMax(int[] n) {
+                        while (true) {
+                            new Thread(() -> { try { Thread.sleep(60_000); } catch (InterruptedException e) { } }).start();
+                        }
+                    }
+                }
+                """);
+        SubmissionResult next = run("find-max", """
+                class Solution {
+                    public int findMax(int[] n) {
+                        int best = n[0];
+                        for (int x : n) best = Math.max(best, x);
+                        return best;
+                    }
+                }
+                """);
+
+        assertThat(bomb.verdict()).isNotEqualTo(Verdict.ACCEPTED);
+        assertThat(next.verdict()).isEqualTo(Verdict.ACCEPTED);
+    }
+
+    private static void assertBlocked(String attempt) {
+        SubmissionResult result = run("find-max", """
+                class Solution {
+                    public int findMax(int[] n) {
+                        try { %s return n[0]; }
+                        catch (Exception e) { throw new IllegalStateException("blocked: " + e); }
+                    }
+                }
+                """.formatted(attempt));
+
+        assertThat(result.verdict()).isEqualTo(Verdict.RUNTIME_ERROR);
+        assertThat(result.failedCase().stderr()).contains("blocked").contains("AccessControlException");
+    }
 }

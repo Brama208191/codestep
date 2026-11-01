@@ -10,7 +10,6 @@ import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.Permission;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Stream;
@@ -132,6 +131,10 @@ public final class TestRunner {
         Runtime.getRuntime().halt(0);
     }
 
+    /**
+     * Every other permission check goes to the policy (runner.policy), which trusts this class and
+     * grants the submission's classes nothing beyond reading system properties.
+     */
     @SuppressWarnings("removal")
     private static void installExitGuard() {
         System.setSecurityManager(new SecurityManager() {
@@ -140,14 +143,7 @@ public final class TestRunner {
                 if (!exitAllowed) {
                     throw new ExitRequested(status);
                 }
-            }
-
-            @Override
-            public void checkPermission(Permission perm) {
-            }
-
-            @Override
-            public void checkPermission(Permission perm, Object context) {
+                super.checkExit(status);
             }
         });
     }

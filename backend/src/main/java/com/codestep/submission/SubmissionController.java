@@ -5,7 +5,9 @@ import com.codestep.judge.Verdict;
 import com.codestep.problem.ProblemRepository;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
+import com.codestep.web.SlidingWindowLimiter;
 import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -36,32 +40,47 @@ public class SubmissionController {
 
     private final ProblemRepository problems;
     private final SubmissionRepository submissions;
-    private final SubmissionQueue queue;
+    private final SubmissionDispatcher queue;
     private final SseHub hub;
     private final Counter created;
     private final int maxInFlight;
     private final int maxQueued;
+    private final SlidingWindowLimiter perClientIp;
+    private final SlidingWindowLimiter siteWide;
 
     public SubmissionController(ProblemRepository problems,
                                 SubmissionRepository submissions,
-                                SubmissionQueue queue,
+                                SubmissionDispatcher queue,
                                 SseHub hub,
                                 MeterRegistry metrics,
                                 @Value("${codestep.api.max-in-flight-per-client}") int maxInFlight,
-                                @Value("${codestep.api.max-queued}") int maxQueued) {
+                                @Value("${codestep.api.max-queued}") int maxQueued,
+                                @Value("${codestep.api.submissions-per-minute-per-ip:20}") int perMinutePerIp,
+                                @Value("${codestep.api.submissions-per-hour:300}") int perHour) {
         this.problems = problems;
         this.submissions = submissions;
         this.queue = queue;
         this.hub = hub;
         this.maxInFlight = maxInFlight;
         this.maxQueued = maxQueued;
+        // Judging costs CPU: a cap per IP, and one for the whole site against attackers rotating IPs.
+        this.perClientIp = new SlidingWindowLimiter(perMinutePerIp, Duration.ofMinutes(1), Clock.systemUTC());
+        this.siteWide = new SlidingWindowLimiter(perHour, Duration.ofHours(1), Clock.systemUTC());
         this.created = Counter.builder("codestep.submissions.created").register(metrics);
         Gauge.builder("codestep.queue.waiting", submissions, repo -> repo.countByStatus(SubmissionStatus.QUEUED))
                 .register(metrics);
     }
 
     @PostMapping
-    public ResponseEntity<Accepted> create(@Valid @RequestBody CreateSubmission request) {
+    public ResponseEntity<Accepted> create(@Valid @RequestBody CreateSubmission request, HttpServletRequest http) {
+        if (!perClientIp.tryAcquire(http.getRemoteAddr())) {
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                    "You're submitting very quickly. Wait a minute and try again.");
+        }
+        if (!siteWide.tryAcquire("all")) {
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                    "The judge is very busy right now. Please try again later.");
+        }
         if (problems.findBySlug(request.slug()).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Problem not found");
         }

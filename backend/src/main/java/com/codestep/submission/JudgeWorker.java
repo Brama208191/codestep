@@ -1,15 +1,9 @@
 package com.codestep.submission;
 
-import com.codestep.judge.JudgeService;
-import com.codestep.judge.SubmissionResult;
-import com.codestep.problem.Problem;
-import com.codestep.problem.ProblemRepository;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.stereotype.Component;
@@ -21,8 +15,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+/** Judges submissions from the Redis Stream, as one of any number of workers. */
 @Component
-@ConditionalOnProperty(name = "codestep.worker.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnExpression("${codestep.worker.enabled:true} and '${codestep.queue:redis}' == 'redis'")
 public class JudgeWorker implements SmartLifecycle {
 
     private static final Logger log = LoggerFactory.getLogger(JudgeWorker.class);
@@ -32,27 +27,18 @@ public class JudgeWorker implements SmartLifecycle {
 
     private final SubmissionQueue queue;
     private final SubmissionRepository submissions;
-    private final SubmissionEvents events;
-    private final ProblemRepository problems;
-    private final JudgeService judge;
-    private final MeterRegistry metrics;
+    private final SubmissionJudge judge;
     private final int threadCount;
     private final List<Thread> threads = new ArrayList<>();
     private volatile boolean running;
 
     public JudgeWorker(SubmissionQueue queue,
                        SubmissionRepository submissions,
-                       SubmissionEvents events,
-                       ProblemRepository problems,
-                       JudgeService judge,
-                       MeterRegistry metrics,
+                       SubmissionJudge judge,
                        @Value("${codestep.worker.threads}") int threadCount) {
         this.queue = queue;
         this.submissions = submissions;
-        this.events = events;
-        this.problems = problems;
         this.judge = judge;
-        this.metrics = metrics;
         this.threadCount = threadCount;
     }
 
@@ -118,24 +104,7 @@ public class JudgeWorker implements SmartLifecycle {
     }
 
     void process(MapRecord<String, Object, Object> record) {
-        UUID id = SubmissionQueue.submissionId(record);
-        Submission submission = submissions.findById(id).orElse(null);
-        if (submission == null || !submissions.claimForJudging(id, ABANDONED_AFTER)) {
-            queue.acknowledge(record.getId());
-            return;
-        }
-        events.publish(id, SubmissionStatus.RUNNING, null);
-        metrics.timer("codestep.queue.wait").record(Duration.between(submission.createdAt(), java.time.Instant.now()));
-
-        Problem problem = problems.findBySlug(submission.problemSlug()).orElse(null);
-        Timer.Sample sample = Timer.start(metrics);
-        SubmissionResult result = problem == null
-                ? SubmissionResult.internalError("This problem no longer exists.")
-                : judge.judge(problem, submission.code(), submission.samplesOnly());
-        sample.stop(metrics.timer("codestep.judge.duration", "verdict", result.verdict().name()));
-
-        submissions.complete(id, result);
-        events.publish(id, SubmissionStatus.DONE, result);
+        judge.judge(SubmissionQueue.submissionId(record), ABANDONED_AFTER);
         queue.acknowledge(record.getId());
     }
 

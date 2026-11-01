@@ -17,11 +17,12 @@ class DockerSandboxArchiveTest {
 
     @Test
     void packsSourcesAndNumberedTestInputs() throws IOException {
-        byte[] archive = DockerSandbox.archive(Map.of("Solution.java", "class Solution {}"), List.of("1\n", "2\n"));
+        byte[] archive = DockerSandbox.archive(Map.of("Solution.java", "class Solution {}"), "Main", 2, List.of("1\n", "2\n"));
 
         Map<String, String> entries = read(archive);
 
         assertThat(entries).containsKeys("src/", "tests/");
+        assertThat(entries).containsEntry("main", "Main").containsEntry("limit", "2");
         assertThat(entries).containsEntry("src/Solution.java", "class Solution {}");
         assertThat(entries).containsEntry("tests/000.in", "1\n");
         assertThat(entries).containsEntry("tests/001.in", "2\n");

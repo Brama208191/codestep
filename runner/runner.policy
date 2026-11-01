@@ -1,0 +1,7 @@
+// Appended to the JDK's default policy, which already covers the JDK's own modules.
+// TestRunner is trusted. Submitted classes get only what the default policy grants every
+// codebase: reading a fixed list of harmless system properties. No files, sockets,
+// processes, native libraries, reflection into the JDK or replacing the security manager.
+grant codeBase "file:/opt/runner/" {
+    permission java.security.AllPermission;
+};

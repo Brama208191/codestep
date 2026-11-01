@@ -1,5 +1,7 @@
 # codestep
 
+**Live demo:** https://YOUR-APP.up.railway.app
+
 A beginner-friendly practice platform for data structures and algorithms in Java.
 
 Most coding-practice sites assume you already know how to approach a problem. codestep teaches the
@@ -58,6 +60,7 @@ Every submission runs in a fresh, throwaway container:
 | Privilege escalation | runs as `nobody`, `--cap-drop ALL`, `no-new-privileges` |
 | `System.exit` ending the run early | caught, so the remaining tests still run |
 | Static state leaking between tests | each test loads the user's classes in a new class loader |
+| Anything else the JVM allows | a Java security policy ([`runner.policy`](runner/runner.policy)) gives submitted classes no permissions: no files, sockets, processes, native code or reflection into the JDK |
 
 Code reaches the container as a tar stream on stdin, so the worker never shares a filesystem with
 it. For stronger isolation in production, set `JUDGE_RUNTIME=runsc` to run containers under
@@ -66,6 +69,22 @@ it. For stronger isolation in production, set `JUDGE_RUNTIME=runsc` to run conta
 **Prototype trade-off:** the worker controls Docker through the host's Docker socket. Only the
 worker has it (the public API does not), but on a shared host this is equivalent to root, so a
 production setup should run workers on their own machine or VM.
+
+### Single-container mode
+
+Hosts like Railway can't start containers, so the `single` profile fits everything in one:
+
+- The judge runs as its own service ([`runner/judged.sh`](runner/judged.sh)) under an unprivileged
+  `judge` user with an empty environment, reached over `127.0.0.1`. Only the API's `app` user
+  holds the database password, and Linux doesn't let one user read another's process environment.
+- The Java security policy above blocks files, network, processes and native code inside the JVM.
+- An in-process queue replaces Redis, and the API serves the React app and enforces what nginx did:
+  body size cap, rate limits, security headers.
+
+The trade-off is weaker isolation than a container per submission (no kernel-level network cut, no
+per-submission memory cgroup). The judge suites run against both judges in CI, including attacks
+that try to read secrets, open sockets and start processes. Details in
+[docs/deployment.md](docs/deployment.md#how-the-judge-is-isolated-here).
 
 ## Performance
 
@@ -118,9 +137,13 @@ cd backend && mvn verify
   error explanations, the problem catalogue and the sandbox archive.
 - **Integration tests** (`*IT`, Testcontainers):
   - every reference solution is accepted by the real sandbox
-  - sandbox security cases (loops, memory, network, filesystem, `System.exit`, static state, output flooding)
+  - sandbox security cases (loops, memory, network, filesystem, `System.exit`, static state, output
+    flooding, reading the environment, starting processes, removing the security policy, thread bombs)
   - the full API → queue → worker → Postgres → SSE flow, including the per-user in-flight limit
     under concurrent requests (enforced with a Postgres advisory lock)
+  - the single-container flow: in-process queue, recovery after a restart, rate limits, headers
+- The judge suites run twice: once against a container per submission, once against the
+  single-container judge used on Railway.
 
 GitHub Actions runs all of these, the frontend build and the Docker image builds on every push.
 
@@ -165,14 +188,18 @@ The Vite dev server proxies `/api` to `localhost:8080`, so publish the API port 
 | GET | `/api/submissions/{id}` | Status and result |
 | GET | `/api/submissions/{id}/events` | Server-Sent Events: `status`, then `result` |
 | GET | `/api/submissions?problem=&clientId=` | Recent submissions for a problem |
-| GET | `/actuator/prometheus` | Metrics: judge duration, queue wait, submissions, waiting queue size |
+| GET | `/actuator/prometheus` | Metrics: judge duration, queue wait, submissions, waiting queue size (not exposed in the `single` profile) |
 
 ## Deployment
 
-A single small VPS with Caddy for automatic HTTPS: see [deploy/DEPLOY.md](deploy/DEPLOY.md).
+- **Railway** (the live demo): one container plus Railway Postgres, sleeping when idle, about
+  $1 to $3 a month. First-deploy guide, costs and the isolation trade-off:
+  [docs/deployment.md](docs/deployment.md).
+- **A small VPS** with Docker, Caddy and a container per submission: [deploy/DEPLOY.md](deploy/DEPLOY.md).
 
 ## Cost
 
-Everything (Postgres, Redis, API, one worker, nginx) runs within about 1.3 GB of RAM using the memory
-limits in `docker-compose.yml`, so it fits on a single small VPS. Grafana and Prometheus are
+On Railway the app uses about 0.17 GB idle and up to about 0.6 GB while judging, and sleeps when
+nobody is using it. On a VPS, everything (Postgres, Redis, API, one worker, nginx) runs within
+about 1.3 GB of RAM using the memory limits in `docker-compose.yml`. Grafana and Prometheus are
 optional (`--profile monitoring`).

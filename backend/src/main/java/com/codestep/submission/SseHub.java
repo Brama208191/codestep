@@ -4,6 +4,7 @@ import com.codestep.judge.SubmissionResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,11 +47,17 @@ public class SseHub implements MessageListener {
         return emitter;
     }
 
+    // The verdict can reach a fresh stream twice: from the controller, which found the submission
+    // already done, and from the judge's event at the same moment. Whichever comes second finds the
+    // stream completed (IllegalStateException) and has nothing left to do.
+
     public void sendStatus(SseEmitter emitter, SubmissionStatus status) {
         try {
             emitter.send(SseEmitter.event().name("status").data(Map.of("status", status), MediaType.APPLICATION_JSON));
         } catch (IOException e) {
             emitter.completeWithError(e);
+        } catch (IllegalStateException alreadyCompleted) {
+            // the result was sent first
         }
     }
 
@@ -60,6 +67,8 @@ public class SseHub implements MessageListener {
             emitter.complete();
         } catch (IOException e) {
             emitter.completeWithError(e);
+        } catch (IllegalStateException alreadyCompleted) {
+            // the result was already sent on this stream
         }
     }
 
@@ -72,6 +81,11 @@ public class SseHub implements MessageListener {
             log.warn("Ignoring malformed submission event", e);
             return;
         }
+        deliver(event);
+    }
+
+    /** Sends the event to every browser watching that submission. */
+    public void deliver(SubmissionEvents.Event event) {
         Set<SseEmitter> listeners = emitters.get(event.id());
         if (listeners == null) {
             return;
@@ -93,14 +107,14 @@ public class SseHub implements MessageListener {
     }
 
     @Configuration
-    @ConditionalOnProperty(name = "codestep.api.enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnExpression("${codestep.api.enabled:true} and '${codestep.queue:redis}' == 'redis'")
     static class ListenerConfig {
 
         @Bean
         RedisMessageListenerContainer submissionEventsListener(RedisConnectionFactory factory, SseHub hub) {
             RedisMessageListenerContainer container = new RedisMessageListenerContainer();
             container.setConnectionFactory(factory);
-            container.addMessageListener(hub, new ChannelTopic(SubmissionEvents.CHANNEL));
+            container.addMessageListener(hub, new ChannelTopic(RedisSubmissionEvents.CHANNEL));
             return container;
         }
     }

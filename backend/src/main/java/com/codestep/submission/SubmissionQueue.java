@@ -1,6 +1,7 @@
 package com.codestep.submission;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -23,7 +24,8 @@ import java.util.Map;
 import java.util.UUID;
 
 @Component
-public class SubmissionQueue {
+@ConditionalOnProperty(name = "codestep.queue", havingValue = "redis", matchIfMissing = true)
+public class SubmissionQueue implements SubmissionDispatcher {
 
     static final String STREAM = "codestep:submissions";
     static final String GROUP = "judges";
@@ -59,6 +61,7 @@ public class SubmissionQueue {
         return connection.execute("XGROUP", bytes("CREATE"), bytes(STREAM), bytes(GROUP), bytes("0"), bytes("MKSTREAM"));
     }
 
+    @Override
     public void enqueue(UUID submissionId) {
         redis.opsForStream().add(StreamRecords.string(Map.of("id", submissionId.toString())).withStreamKey(STREAM));
         redis.opsForStream().trim(STREAM, MAX_LENGTH, true);

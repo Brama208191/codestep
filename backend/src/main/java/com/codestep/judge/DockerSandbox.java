@@ -3,6 +3,7 @@ package com.codestep.judge;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
@@ -11,6 +12,7 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@ConditionalOnProperty(name = "judge.mode", havingValue = "docker", matchIfMissing = true)
 public class DockerSandbox implements Sandbox {
 
     private static final long STARTUP_ALLOWANCE_SECONDS = 15;
@@ -48,7 +51,7 @@ public class DockerSandbox implements Sandbox {
         });
 
         try (OutputStream stdin = process.getOutputStream()) {
-            stdin.write(archive(sources, inputs));
+            stdin.write(framed(archive(sources, mainClass, timeLimitSeconds, inputs)));
         } catch (IOException ignored) {
         }
 
@@ -86,10 +89,22 @@ public class DockerSandbox implements Sandbox {
         return command;
     }
 
-    static byte[] archive(Map<String, String> sources, List<String> inputs) throws IOException {
+    /** run.sh reads the archive's size on the first line, then exactly that many bytes. */
+    static byte[] framed(byte[] archive) {
+        byte[] header = (archive.length + "\n").getBytes(StandardCharsets.US_ASCII);
+        byte[] job = Arrays.copyOf(header, header.length + archive.length);
+        System.arraycopy(archive, 0, job, header.length, archive.length);
+        return job;
+    }
+
+    /** The job for run.sh, which also reads the main class and time limit from {@code main} and {@code limit}. */
+    static byte[] archive(Map<String, String> sources, String mainClass, int timeLimitSeconds, List<String> inputs)
+            throws IOException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (TarArchiveOutputStream tar = new TarArchiveOutputStream(bytes)) {
             tar.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
+            addFile(tar, "main", mainClass);
+            addFile(tar, "limit", String.valueOf(timeLimitSeconds));
             addDirectory(tar, "src/");
             addDirectory(tar, "tests/");
             for (Map.Entry<String, String> source : sources.entrySet()) {

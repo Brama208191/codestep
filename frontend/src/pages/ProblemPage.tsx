@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Editor from "@monaco-editor/react";
+import "../monaco";
 import { fetchProblem, judge } from "../api";
 import { clearCode, loadCode, markSolved, saveCode } from "../progress";
 import type { ProblemDetail, SubmissionResult, SubmissionStatus } from "../types";
