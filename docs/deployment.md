@@ -89,6 +89,8 @@ What it can't do that Docker does: cut the network at the kernel level (layer 1 
 
 Every response carries a Content Security Policy (scripts and workers only from the app itself; the Monaco editor is bundled, not loaded from a CDN), HSTS, `nosniff`, `X-Frame-Options: DENY`, a referrer policy and a permissions policy. The API also does what nginx did in docker-compose: request bodies are capped at 256 KB, submissions are rate limited, and `/problems/...` links are served the app. Database errors are logged in full but answered with a generic message. Metrics (`/actuator/prometheus`) aren't exposed.
 
+Rate limits key on the visitor's address. Railway reports it in `X-Real-IP`; it passes `X-Forwarded-For` through from the client, where anyone can put any address, so the `single` profile reads `X-Real-IP`, and only from the platform's internal proxy. Behind a different proxy, set `CLIENT_IP_HEADER` to the header it sets.
+
 ## Operating it
 
 | Task | Where |

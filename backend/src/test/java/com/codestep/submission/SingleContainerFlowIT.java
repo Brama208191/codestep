@@ -142,12 +142,12 @@ class SingleContainerFlowIT {
         return post(clientId, code, null);
     }
 
-    /** {@code forwardedFor} gives the request its own rate-limit bucket, as Railway's proxy would. */
+    /** {@code forwardedFor} gives the request its own rate-limit bucket, set the way Railway's edge does. */
     private ResponseEntity<Map<String, Object>> post(String clientId, String code, String forwardedFor) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         if (forwardedFor != null) {
-            headers.set("X-Forwarded-For", forwardedFor);
+            headers.set("X-Real-IP", forwardedFor);
         }
         return http.exchange("/api/submissions", HttpMethod.POST,
                 new HttpEntity<>(Map.of("slug", "find-max", "code", code, "samplesOnly", false, "clientId", clientId), headers),
@@ -169,5 +169,23 @@ class SingleContainerFlowIT {
             }
         }
         return submissions.findById(id).orElseThrow().status();
+    }
+
+    @Test
+    void aClientWritingItsOwnForwardedForCannotDodgeTheLimit() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        List<HttpStatus> statuses = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            headers.set("X-Real-IP", "203.0.113.77");
+            headers.set("X-Forwarded-For", "198.51.100." + (i + 1));
+            statuses.add((HttpStatus) http.exchange("/api/submissions", HttpMethod.POST,
+                    new HttpEntity<>(Map.of("slug", "find-max", "code", "CORRECT", "samplesOnly", false,
+                            "clientId", "single-d-" + i), headers),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    }).getStatusCode());
+        }
+
+        assertThat(statuses).contains(HttpStatus.TOO_MANY_REQUESTS);
     }
 }

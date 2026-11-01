@@ -24,6 +24,12 @@ spring:
 
 server:
   forward-headers-strategy: native
+  tomcat:
+    remoteip:
+      # Railway's edge reports the visitor's address in X-Real-IP and passes X-Forwarded-For through
+      # from the client, where anyone can write anything. Rate limits key on this header, and only
+      # when the request comes from the platform's internal proxy.
+      remote-ip-header: ${CLIENT_IP_HEADER:X-Real-IP}
   # nginx compressed responses in docker-compose; here the app serves the bundles itself.
   compression:
     enabled: true
