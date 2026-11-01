@@ -1,6 +1,6 @@
 # codestep
 
-**Live demo:** https://YOUR-APP.up.railway.app
+**Live demo:** https://codestep-production.up.railway.app
 
 A beginner-friendly practice platform for data structures and algorithms in Java.
 
